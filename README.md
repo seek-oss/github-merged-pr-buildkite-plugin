@@ -9,7 +9,7 @@ This ensures tests run against the "merged" branch, helping catch bad merges.
 ```yml
 steps:
   - plugins:
-      zsims/github-pr#v0.0.1: ~
+      zsims/github-pr#v0.0.2: ~
 ```
 
 ## Tests
