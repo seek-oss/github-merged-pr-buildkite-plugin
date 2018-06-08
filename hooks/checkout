@@ -7,5 +7,6 @@ if [[ -n "${BUILDKITE_PULL_REQUEST}" && "${BUILDKITE_PULL_REQUEST}" != "false" ]
   git fetch origin "refs/pull/${BUILDKITE_PULL_REQUEST}/merge"
   git checkout FETCH_HEAD
 else
-  echo "--- No BUILDKITE_PULL_REQUEST variable set, ignoring."
+  echo "--- No BUILDKITE_PULL_REQUEST variable set, doing normal checkout"
+  git checkout "${BUILDKITE_BRANCH}"
 fi
