@@ -9,7 +9,7 @@ This ensures tests run against the "merged" branch, helping catch bad merges.
 ```yml
 steps:
   - plugins:
-      zsims/github-merged-pr#v0.0.3: ~
+      zsims/github-merged-pr#v0.0.4: ~
 ```
 
 Ensure `Skip pull request builds for existing commits` is set to `false` in your Pipeline settings, as BuildKite will build the branch and skip the PR build.
