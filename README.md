@@ -12,6 +12,8 @@ steps:
       zsims/github-pr#v0.0.2: ~
 ```
 
+Ensure `Skip pull request builds for existing commits` is set to `false` in your Pipeline settings, as BuildKite will build the branch and skip the PR build.
+
 ## Tests
 
 To run the tests of this plugin, run
