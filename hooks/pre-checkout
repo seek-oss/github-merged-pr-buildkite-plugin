@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [[ -n "${BUILDKITE_PULL_REQUEST}" && "${BUILDKITE_PULL_REQUEST}" != "false" ]] ; then
+  # Setting BUILDKITE_REFSPEC will avoid other checkout behavior: https://github.com/buildkite/agent/blob/3b979f044ec7321470a8b1d742eee23ad4f31bce/templates/bootstrap.sh#L288
+  export BUILDKITE_REFSPEC="refs/pull/${BUILDKITE_PULL_REQUEST}/merge"
+  echo "--- Setting BUILDKITE_REFSPEC to ${BUILDKITE_REFSPEC}"
+else
+  echo "--- No BUILDKITE_PULL_REQUEST variable set, using default checkout behavior"
+fi

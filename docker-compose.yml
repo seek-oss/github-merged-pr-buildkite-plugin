@@ -6,7 +6,7 @@ services:
       - ".:/plugin:ro"
   lint:
     image: buildkite/plugin-linter
-    command: ['--name', 'zsims/github-pr']
+    command: ['--name', 'zsims/github-merged-pr']
     volumes:
       - ".:/plugin:ro"
 
