@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-if [[ -n "${BUILDKITE_PULL_REQUEST}" ]] ; then
+if [[ -n "${BUILDKITE_PULL_REQUEST}" && "${BUILDKITE_PULL_REQUEST}" != "false" ]] ; then
   echo "--- Checking out merge ref for PR ${BUILDKITE_PULL_REQUEST}"
   git fetch origin "refs/pull/${BUILDKITE_PULL_REQUEST}/merge"
   git checkout FETCH_HEAD

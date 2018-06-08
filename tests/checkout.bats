@@ -33,3 +33,15 @@ checkout_hook="$PWD/hooks/checkout"
   refute_output --partial "GIT_CHECKED_OUT_FETCH_HEAD"
   assert_output --partial "No BUILDKITE_PULL_REQUEST variable set"
 }
+
+@test "Does nothing if no PR variable is false" {
+  export -f git
+  export BUILDKITE_PULL_REQUEST="false"
+
+  run "$checkout_hook"
+
+  assert_success
+  refute_output --partial "GIT_FETCHED"
+  refute_output --partial "GIT_CHECKED_OUT_FETCH_HEAD"
+  assert_output --partial "No BUILDKITE_PULL_REQUEST variable set"
+}
