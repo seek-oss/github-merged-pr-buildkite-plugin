@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [[ -n "${BUILDKITE_PULL_REQUEST}" ]] ; then
+  echo "--- Checking out merge ref for PR ${BUILDKITE_PULL_REQUEST}"
+  git fetch origin "refs/pull/${BUILDKITE_PULL_REQUEST}/merge"
+  git checkout FETCH_HEAD
+else
+  echo "--- No BUILDKITE_PULL_REQUEST variable set, ignoring."
+fi
