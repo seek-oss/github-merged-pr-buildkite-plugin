@@ -15,6 +15,7 @@ function trigger_merged_build() {
   cat <<EOL | buildkite-agent pipeline upload 
   - label: "Merge build"
     trigger: "${slug}"
+    async: true
     build:
       message: "Merge build for Pull Request ${pr}"
       branch: "${ref}"
