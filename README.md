@@ -13,14 +13,14 @@ The plugin has two modes:
 ```yml
 steps:
   - plugins:
-      zsims/github-merged-pr#v0.0.5:
+      seek-oss/github-merged-pr#v0.0.5:
         mode: checkout
 ```
 
 ```yml
 steps:
   - plugins:
-      zsims/github-merged-pr#v0.0.5:
+      seek-oss/github-merged-pr#v0.0.5:
         mode: trigger
 ```
 

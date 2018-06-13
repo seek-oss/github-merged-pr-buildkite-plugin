@@ -1,6 +1,6 @@
 name: github-merged-pr
 description: Checks out the GitHub PR merge ref rather than the branch HEAD
-author: https://github.com/zsims
+author: https://github.com/seek-oss
 requirements: []
 configuration:
   properties:
