@@ -2,10 +2,41 @@
 
 set -euo pipefail
 
-if [[ -n "${BUILDKITE_PULL_REQUEST}" && "${BUILDKITE_PULL_REQUEST}" != "false" ]] ; then
+mode="checkout"
+if [[ -v BUILDKITE_PLUGIN_GITHUB_MERGED_PR_MODE ]]; then
+  mode="${BUILDKITE_PLUGIN_GITHUB_MERGED_PR_MODE}"
+fi
+
+function trigger_merged_build() {
+  local slug="${BUILDKITE_PIPELINE_SLUG}"
+  local pr="${BUILDKITE_PULL_REQUEST}"
+  local ref="refs/pull/${pr}/merge"
+  echo "--- Triggering merged build of ${slug} for PR ${pr} (ref ${ref})"
+  cat <<EOL | buildkite-agent pipeline upload 
+  - label: "Merge build"
+    trigger: "${slug}"
+    async: true
+    build:
+      message: "Merge build for Pull Request ${pr}"
+      branch: "${ref}"
+EOL
+}
+
+function update_ref_to_merged() {
   # Setting BUILDKITE_REFSPEC will avoid other checkout behavior: https://github.com/buildkite/agent/blob/3b979f044ec7321470a8b1d742eee23ad4f31bce/templates/bootstrap.sh#L288
   export BUILDKITE_REFSPEC="refs/pull/${BUILDKITE_PULL_REQUEST}/merge"
   echo "--- Setting BUILDKITE_REFSPEC to ${BUILDKITE_REFSPEC}"
+}
+
+if [[ -n "${BUILDKITE_PULL_REQUEST}" && "${BUILDKITE_PULL_REQUEST}" != "false" ]] ; then
+  if [[ "$mode" == "checkout" ]]; then
+    update_ref_to_merged
+  elif [[ "$mode" == "trigger" ]]; then
+    trigger_merged_build
+  else
+    echo "--- Invalid mode: $mode"
+    exit 1
+  fi
 else
   echo "--- No BUILDKITE_PULL_REQUEST variable set, using default checkout behavior"
 fi
