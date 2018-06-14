@@ -15,6 +15,10 @@ The plugin has two modes:
 
 # Example
 
+Ensure `Skip pull request builds for existing commits` is set to `false` in your Pipeline settings, as BuildKite will build the branch and skip the PR build.
+
+![pr-settings](./buildkite-pr-settings.png)
+
 ## Checkout Mode
 When using `checkout` mode, the plugin should be specified on each build step (e.g. where a checkout happens).
 
@@ -53,8 +57,6 @@ steps:
     commands:
       - make something-else
 ```
-
-Ensure `Skip pull request builds for existing commits` is set to `false` in your Pipeline settings, as BuildKite will build the branch and skip the PR build.
 
 # Tests
 
