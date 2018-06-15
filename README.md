@@ -73,7 +73,7 @@ MIT (see [LICENSE](LICENSE))
 
 # Bad Merge Example
 
-An example of why it may be desirable to build the merged commit. Let's say you're raising a PR to implement an `add` function to a calculator that already does `subtract`ion:
+An example of why it may be desirable to build the merged commit. Let's say you're raising a PR to implement an `add` function to a calculator that can already `subtract`:
 
 `origin/master` (commit `1abcdef`): calculator.js
 ```
