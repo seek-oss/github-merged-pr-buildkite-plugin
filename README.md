@@ -7,6 +7,8 @@ Why would I want this?
  2. Can help avoid building stale branches, as CI is done against the target branch at the time of the PR being raised rather than when the source branch was created
  3. Reduce the risk of failed builds from reaching master, due to bad merges (See the example at the bottom of this document)
 
+While this approach doesn't mitigate breaking changes made to the target branch branch *after* the PR is raised, it does help reduce the [time] window in which bad merges can appear -- the thinking being the age of a PR is clearly visible on GitHub unlike the age of the parent commit for a PR branch.
+
 # Modes
 
 The plugin has two modes:
@@ -71,7 +73,7 @@ MIT (see [LICENSE](LICENSE))
 
 # Bad Merge Example
 
-An example of why it may be desirable to build the merged commit. Let's say you're raising a PR to implement a `subtract` function to a calculator that already does `add`ition:
+An example of why it may be desirable to build the merged commit. Let's say you're raising a PR to implement an `add` function to a calculator that can already `subtract`:
 
 `origin/master` (commit `1abcdef`): calculator.js
 ```
