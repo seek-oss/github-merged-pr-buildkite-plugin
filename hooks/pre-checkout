@@ -2,10 +2,7 @@
 
 set -euo pipefail
 
-mode="checkout"
-if [[ -v BUILDKITE_PLUGIN_GITHUB_MERGED_PR_MODE ]]; then
-  mode="${BUILDKITE_PLUGIN_GITHUB_MERGED_PR_MODE}"
-fi
+mode="${BUILDKITE_PLUGIN_GITHUB_MERGED_PR_MODE:-checkout}"
 
 function trigger_merged_build() {
   local slug="${BUILDKITE_PIPELINE_SLUG}"
