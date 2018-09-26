@@ -27,7 +27,7 @@ function merge() {
 
   git fetch -v origin "${target_branch}"
   git checkout FETCH_HEAD
-  git merge "${BUILDKITE_COMMIT}"
+  GIT_COMMITTER_NAME="github-merged-pr-buildkite-plugin" git merge "${BUILDKITE_COMMIT}"
 }
 
 force_merge="${GITHUB_MERGED_PR_FORCE_BRANCH:-}"
