@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+function trigger() {
+  local pr="$1"
+  local branch="$2"
+  local slug="${BUILDKITE_PIPELINE_SLUG}"
+  echo "Triggering merged build of ${slug} for PR ${pr}"
+  cat <<EOL | buildkite-agent pipeline upload 
+  - label: "Merge build"
+    trigger: "${slug}"
+    async: true
+    build:
+      message: "Merge build for Pull Request ${pr}"
+      env:
+        GITHUB_MERGED_PR_FORCE_BRANCH: "${2}"
+EOL
+}
+
+function merge() {
+  local target_branch="$1"
+  if [[ -z "${target_branch}" ]] ; then
+    echo "No pull request target branch"
+    exit 1
+  fi
+
+  git checkout "origin/${target_branch}"
+  git merge "${BUILDKITE_COMMIT}"
+}
+
+force_merge="${GITHUB_MERGED_PR_FORCE_BRANCH:-}"
+if [[ -n "$force_merge" ]]; then
+  echo "Forcing merge into ${force_merge}"
+  merge "${force_merge}"
+  exit $?
+fi
+
+# this is a pull request build
+pull_request="${BUILDKITE_PULL_REQUEST:-false}"
+if [[ "${pull_request}" == "false" ]] ; then
+  echo "Not a pull request, skipping"
+  exit 0
+fi
+
+mode="${BUILDKITE_PLUGIN_GITHUB_MERGED_PR_MODE:-checkout}"
+if [[ "${mode}" == "checkout" ]]; then
+  merge "${BUILDKITE_PULL_REQUEST_BASE_BRANCH:-master}"
+  exit $?
+elif [[ "${mode}" == "trigger" ]]; then
+  trigger "${pull_request}" "${BUILDKITE_BRANCH:-master}"
+else
+  echo "Invalid mode: ${mode}"
+  exit 1
+fi
+
