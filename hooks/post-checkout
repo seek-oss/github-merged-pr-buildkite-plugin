@@ -25,7 +25,8 @@ function merge() {
     exit 1
   fi
 
-  git checkout "origin/${target_branch}"
+  git fetch -v origin "${target_branch}"
+  git checkout FETCH_HEAD
   git merge "${BUILDKITE_COMMIT}"
 }
 

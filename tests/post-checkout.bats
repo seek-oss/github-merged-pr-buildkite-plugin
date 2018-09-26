@@ -28,12 +28,14 @@ post_checkout_hook="$PWD/hooks/post-checkout"
   export BUILDKITE_COMMIT="deadbeef"
 
   stub git \
-    "checkout origin/dev : echo CHECKED_OUT" \
+    "fetch -v origin dev : echo FETCHED" \
+    "checkout FETCH_HEAD : echo CHECKED_OUT" \
     "merge deadbeef : echo MERGED"
 
   run "$post_checkout_hook"
 
   assert_success
+  assert_output --partial "FETCHED"
   assert_output --partial "CHECKED_OUT"
   assert_output --partial "MERGED"
   unstub git
@@ -44,12 +46,14 @@ post_checkout_hook="$PWD/hooks/post-checkout"
   export GITHUB_MERGED_PR_FORCE_BRANCH="master"
 
   stub git \
-    "checkout origin/master : echo CHECKED_OUT" \
+    "fetch -v origin master : echo FETCHED" \
+    "checkout FETCH_HEAD : echo CHECKED_OUT" \
     "merge deadbeef : echo MERGED"
 
   run "$post_checkout_hook"
 
   assert_success
+  assert_output --partial "FETCHED"
   assert_output --partial "CHECKED_OUT"
   assert_output --partial "MERGED"
   unstub git
