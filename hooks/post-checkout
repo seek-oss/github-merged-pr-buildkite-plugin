@@ -8,13 +8,15 @@ function trigger() {
   local slug="${BUILDKITE_PIPELINE_SLUG}"
   echo "Triggering merged build of ${slug} for PR ${pr}"
   cat <<EOL | buildkite-agent pipeline upload 
-  - label: "Merge build"
-    trigger: "${slug}"
-    async: true
-    build:
-      message: "Merge build for Pull Request ${pr}"
-      env:
-        GITHUB_MERGED_PR_FORCE_BRANCH: "${2}"
+  steps:
+    - label: "Merge build"
+      trigger: "${slug}"
+      async: true
+      build:
+        message: "Merge build for Pull Request ${pr}"
+        branch: "${BUILDKITE_BRANCH}"
+        env:
+          GITHUB_MERGED_PR_FORCE_BRANCH: "${2}"
 EOL
 }
 
@@ -49,7 +51,7 @@ if [[ "${mode}" == "checkout" ]]; then
   merge "${BUILDKITE_PULL_REQUEST_BASE_BRANCH:-master}"
   exit $?
 elif [[ "${mode}" == "trigger" ]]; then
-  trigger "${pull_request}" "${BUILDKITE_BRANCH:-master}"
+  trigger "${pull_request}" "${BUILDKITE_PULL_REQUEST_BASE_BRANCH:-}"
 else
   echo "Invalid mode: ${mode}"
   exit 1
