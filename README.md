@@ -1,6 +1,6 @@
 # GitHub Pull Request Plugin
 
-A [Buildkite plugin](https://buildkite.com/docs/agent/v3/plugins) to build the merged state of GitHub pull requests.
+A [Buildkite plugin](https://buildkite.com/docs/agent/v3/plugins) to build the merged state of pull requests.
 
 Why would I want this?
  1. Parity with other CI setups. Including [TeamCity](https://blog.jetbrains.com/teamcity/2013/02/automatically-building-pull-requests-from-github-with-teamcity/), Travis, and [Jenkins](https://wiki.jenkins.io/display/JENKINS/GitHub+pull+request+builder+plugin).
@@ -13,7 +13,7 @@ While this approach doesn't mitigate breaking changes made to the target branch 
 
 The plugin has two modes:
   - `mode: trigger` to async trigger another build (of the current pipeline); and
-  - `mode: checkout` to checkout the PR merged ref (`refs/pull/123/merge`) rather than the head (`refs/pull/123/head`)
+  - `mode: checkout` to merge the PR after checking out source
 
 # Example
 
