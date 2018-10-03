@@ -34,7 +34,7 @@ merge() {
   export GIT_COMMITTER_EMAIL="foo@bar"
   export GIT_AUTHOR_NAME="github-merged-pr-buildkite-plugin"
   export GIT_COMMITTER_NAME="github-merged-pr-buildkite-plugin"
-  git merge "${BUILDKITE_COMMIT} "
+  git merge "${BUILDKITE_COMMIT}"
 }
 
 force_merge="${GITHUB_MERGED_PR_FORCE_BRANCH:-}"
