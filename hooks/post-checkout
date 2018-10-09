@@ -29,7 +29,10 @@ function merge() {
 
   git fetch -v origin "${target_branch}"
   git checkout FETCH_HEAD
-  GIT_COMMITTER_NAME="github-merged-pr-buildkite-plugin" git merge "${BUILDKITE_COMMIT}"
+  GIT_COMMITTER_EMAIL="auto-merge@buildkite" \
+  GIT_AUTHOR_NAME="github-merged-pr-buildkite-plugin" \
+  GIT_COMMITTER_NAME="github-merged-pr-buildkite-plugin" \
+  git merge --no-edit "${BUILDKITE_COMMIT}"
 }
 
 force_merge="${GITHUB_MERGED_PR_FORCE_BRANCH:-}"
