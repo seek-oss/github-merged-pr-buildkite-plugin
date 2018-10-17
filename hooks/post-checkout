@@ -30,11 +30,11 @@ merge() {
   git fetch -v origin "${target_branch}"
   git checkout FETCH_HEAD
   # env vars to ensure merge is non-interactive
-  export GIT_MERGE_AUTOEDIT="no"
-  export GIT_COMMITTER_EMAIL="foo@bar"
-  export GIT_AUTHOR_NAME="github-merged-pr-buildkite-plugin"
-  export GIT_COMMITTER_NAME="github-merged-pr-buildkite-plugin"
-  git merge "${BUILDKITE_COMMIT}"
+  GIT_AUTHOR_NAME="github-merged-pr-buildkite-plugin" \
+  GIT_COMMITTER_EMAIL="auto-merge@buildkite" \
+  GIT_COMMITTER_NAME="github-merged-pr-buildkite-plugin"
+  GIT_MERGE_AUTOEDIT="no" \
+  git merge --no-edit "${BUILDKITE_COMMIT}"
 }
 
 force_merge="${GITHUB_MERGED_PR_FORCE_BRANCH:-}"
