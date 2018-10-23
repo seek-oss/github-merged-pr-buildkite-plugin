@@ -2,12 +2,12 @@
 
 set -euo pipefail
 
-function trigger() {
+trigger() {
   local pr="$1"
   local branch="$2"
   local slug="${BUILDKITE_PIPELINE_SLUG}"
   echo "Triggering merged build of ${slug} for PR ${pr}"
-  cat <<EOL | buildkite-agent pipeline upload 
+  cat <<EOL | buildkite-agent pipeline upload
   steps:
     - label: "Merge build"
       trigger: "${slug}"
@@ -20,7 +20,7 @@ function trigger() {
 EOL
 }
 
-function merge() {
+merge() {
   local target_branch="$1"
   if [[ -z "${target_branch}" ]] ; then
     echo "No pull request target branch"
@@ -29,10 +29,12 @@ function merge() {
 
   git fetch -v origin "${target_branch}"
   git checkout FETCH_HEAD
-  GIT_COMMITTER_EMAIL="auto-merge@buildkite" \
+  # env vars to ensure merge is non-interactive
   GIT_AUTHOR_NAME="github-merged-pr-buildkite-plugin" \
-  GIT_COMMITTER_NAME="github-merged-pr-buildkite-plugin" \
-  git merge --no-edit "${BUILDKITE_COMMIT}"
+  GIT_COMMITTER_EMAIL="auto-merge@buildkite" \
+  GIT_COMMITTER_NAME="github-merged-pr-buildkite-plugin"
+  GIT_MERGE_AUTOEDIT="no" \
+  git merge "${BUILDKITE_COMMIT}"
 }
 
 force_merge="${GITHUB_MERGED_PR_FORCE_BRANCH:-}"
@@ -59,4 +61,3 @@ else
   echo "Invalid mode: ${mode}"
   exit 1
 fi
-
