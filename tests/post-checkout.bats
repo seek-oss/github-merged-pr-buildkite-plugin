@@ -30,7 +30,7 @@ post_checkout_hook="$PWD/hooks/post-checkout"
   stub git \
     "fetch -v origin dev : echo FETCHED" \
     "checkout FETCH_HEAD : echo CHECKED_OUT" \
-    "merge deadbeef : echo MERGED"
+    "merge --no-edit deadbeef : echo MERGED"
 
   run "$post_checkout_hook"
 
@@ -48,7 +48,7 @@ post_checkout_hook="$PWD/hooks/post-checkout"
   stub git \
     "fetch -v origin master : echo FETCHED" \
     "checkout FETCH_HEAD : echo CHECKED_OUT" \
-    "merge deadbeef : echo MERGED"
+    "merge --no-edit deadbeef : echo MERGED"
 
   run "$post_checkout_hook"
 
