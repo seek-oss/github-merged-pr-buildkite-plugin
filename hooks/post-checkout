@@ -33,8 +33,12 @@ merge() {
   GIT_AUTHOR_NAME="github-merged-pr-buildkite-plugin" \
   GIT_COMMITTER_EMAIL="auto-merge@buildkite" \
   GIT_COMMITTER_NAME="github-merged-pr-buildkite-plugin"
-  GIT_MERGE_AUTOEDIT="no" \
-  git merge "${BUILDKITE_COMMIT}"
+  git merge --no-edit "${BUILDKITE_COMMIT}" || {
+    local merge_result=$?
+    echo "Merge failed: ${merge_result}"
+    git merge --abort
+    exit $merge_result
+  }
 }
 
 force_merge="${GITHUB_MERGED_PR_FORCE_BRANCH:-}"
