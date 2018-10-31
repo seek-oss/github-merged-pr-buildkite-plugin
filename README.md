@@ -2,6 +2,8 @@
 
 A [Buildkite plugin](https://buildkite.com/docs/agent/v3/plugins) to build the merged state of pull requests.
 
+This means that builds will run against what the merged commit will be, rather than what is in the PR, reducing the risk of bad merges breaking master/trunk.
+
 Why would I want this?
  1. Parity with other CI setups. Including [TeamCity](https://blog.jetbrains.com/teamcity/2013/02/automatically-building-pull-requests-from-github-with-teamcity/), Travis, and [Jenkins](https://wiki.jenkins.io/display/JENKINS/GitHub+pull+request+builder+plugin).
  2. Can help avoid building stale branches, as CI is done against the target branch at the time of the PR being raised rather than when the source branch was created
