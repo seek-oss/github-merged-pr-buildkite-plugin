@@ -28,7 +28,7 @@ When using `checkout` mode, the plugin should be specified on each build step (e
 
 ```yml
 plugins: &plugins
-  seek-oss/github-merged-pr#v0.0.8:
+  seek-oss/github-merged-pr#v1.0.0:
     mode: checkout
 
 steps:
@@ -54,7 +54,7 @@ steps:
     commands:
       - make something
     plugins:
-      seek-oss/github-merged-pr#v0.0.8:
+      seek-oss/github-merged-pr#v1.0.0:
         mode: trigger
 
   - label: 'Make something else'
