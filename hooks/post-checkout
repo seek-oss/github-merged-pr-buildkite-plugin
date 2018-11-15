@@ -32,7 +32,7 @@ merge() {
   # env vars to ensure merge is non-interactive
   GIT_AUTHOR_NAME="github-merged-pr-buildkite-plugin" \
   GIT_COMMITTER_EMAIL="auto-merge@buildkite" \
-  GIT_COMMITTER_NAME="github-merged-pr-buildkite-plugin"
+  GIT_COMMITTER_NAME="github-merged-pr-buildkite-plugin" \
   git merge --no-edit "${BUILDKITE_COMMIT}" || {
     local merge_result=$?
     echo "Merge failed: ${merge_result}"
