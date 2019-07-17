@@ -1,6 +1,6 @@
 # GitHub Pull Request Plugin
 
-A [Buildkite plugin](https://buildkite.com/docs/agent/v3/plugins) to build the merged state of pull requests.
+A [Buildkite plugin](https://buildkite.com/docs/agent/v3/plugins) to build the merged state of pull requests and trigger new builds on PR branches after the default branch is changed.
 
 This means that builds will run against what the merged commit will be, rather than what is in the PR, reducing the risk of bad merges breaking master/trunk.
 
@@ -14,8 +14,8 @@ While this approach doesn't mitigate breaking changes made to the target branch 
 # Modes
 
 The plugin has two modes:
-  - `mode: trigger` to async trigger another build (of the current pipeline); and
-  - `mode: checkout` to merge the PR after checking out source
+  - `mode: checkout` to merge the PR after checking out source; and
+  - `mode: trigger` to async trigger another build (of the current pipeline)
 
 # Example
 
@@ -46,7 +46,8 @@ steps:
 ```
 
 ## Trigger Mode
-In `trigger` mode the plugin should only be specified on one step, to prevent triggering multiple builds.
+In `trigger` mode the plugin should only be specified on one step, to prevent triggering builds multiple times in a pipeline.
+When `update_prs` is set to `true` in this mode, pipelines on the default branch (e.g. `master`) will trigger new builds on all PR branches that still exist in the repository. If `oldest_pr` is set, any PR with an issue number lower than specified will be ignored when triggering new builds.
 
 ```yml
 steps:
@@ -56,6 +57,8 @@ steps:
     plugins:
       - seek-oss/github-merged-pr#v1.0.1:
           mode: trigger
+          update_prs: true
+          oldest_pr: 12
 
   - label: 'Make something else'
     commands:

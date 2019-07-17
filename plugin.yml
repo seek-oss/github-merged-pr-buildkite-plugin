@@ -4,6 +4,10 @@ author: https://github.com/seek-oss
 requirements: []
 configuration:
   properties:
-    cd:
+    mode:
       type: string
+    update_prs:
+      type: boolean
+    oldest_pr:
+      type: integer
   required: []
