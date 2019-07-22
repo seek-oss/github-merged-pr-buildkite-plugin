@@ -164,24 +164,13 @@ post_checkout_hook="$PWD/hooks/post-checkout"
 
   stub git \
     "fetch origin : echo FETCHED" \
-    "ls-remote origin 'refs/pull/*/head' : echo deadbeef refs/pull/123/head" \
-    "merge-base --is-ancestor deadbeef dev : echo UNMERGED && false" \
-    "branch -a -q --contains deadbeef : echo remotes/origin/MY_PR_BRANCH"
-
-  stub grep \
-    "remotes/origin : echo remotes/origin/MY_PR_BRANCH"
-
-  stub sed \
-    "-e 's,^[[:space:]]*remotes/origin/,,g' : echo MY_PR_BRANCH"
+    "ls-remote origin 'refs/pull/*/head' : echo deadbeef refs/pull/123/head"
 
   run "$post_checkout_hook"
 
   assert_success
   assert_output --partial "FETCHED"
-  assert_output --partial "UNMERGED"
   unstub git
-  unstub grep
-  unstub sed
 }
 
 @test "Does nothing on default branch when disabled" {
