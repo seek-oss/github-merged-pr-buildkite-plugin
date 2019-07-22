@@ -20,6 +20,45 @@ trigger() {
 EOL
 }
 
+trigger_prs() {
+  git fetch origin
+
+  pr_limit="${BUILDKITE_PLUGIN_GITHUB_MERGED_PR_OLDEST_PR:-false}"
+  while read -r line; do
+    arr=($line)
+    sha="${arr[0]}"
+    pr=$(awk -F'/' '{print $3}' <<< "${arr[1]}")
+    if ! git merge-base --is-ancestor "${sha}" "${BUILDKITE_PIPELINE_DEFAULT_BRANCH}" 2>/dev/null; then
+      branch="$(set +e && git branch -a -q --contains "${sha}" 2>/dev/null | grep 'remotes/origin' | sed -e 's,^[[:space:]]*remotes/origin/,,g')"
+      if [[ "${branch}" != "" ]]; then
+        if [[ "${pr_limit}" == "false" ]] || [[ "${pr}" -ge "${pr_limit}" ]]; then
+          trigger_pr_branch "${pr}" "${branch}" "${sha}"
+        fi
+      fi
+    fi
+  done <<< "$(git ls-remote origin 'refs/pull/*/head')"
+}
+
+trigger_pr_branch() {
+  local pr="$1"
+  local branch="$2"
+  local commit="$3"
+  local slug="${BUILDKITE_PIPELINE_SLUG}"
+
+  echo "Triggering new build of ${slug} for PR ${pr}"
+  cat << EOL | buildkite-agent pipeline upload
+  steps:
+    - trigger: "${slug}"
+      async: true
+      build:
+        message: "Triggered by GitHub Merged PR plugin"
+        branch: "${branch}"
+        commit: "${commit}"
+        env:
+          BUILDKITE_PULL_REQUEST: "${pr}"
+EOL
+}
+
 merge() {
   local target_branch="$1"
   if [[ -z "${target_branch}" ]] ; then
@@ -48,19 +87,31 @@ if [[ -n "$force_merge" ]]; then
   exit $?
 fi
 
-# this is a pull request build
 pull_request="${BUILDKITE_PULL_REQUEST:-false}"
-if [[ "${pull_request}" == "false" ]] ; then
-  echo "Not a pull request, skipping"
-  exit 0
-fi
-
 mode="${BUILDKITE_PLUGIN_GITHUB_MERGED_PR_MODE:-checkout}"
 if [[ "${mode}" == "checkout" ]]; then
+  if [[ "${pull_request}" == "false" ]]; then
+    echo "Not a pull request, skipping"
+    exit 0
+  fi
   merge "${BUILDKITE_PULL_REQUEST_BASE_BRANCH:-master}"
   exit $?
 elif [[ "${mode}" == "trigger" ]]; then
-  trigger "${pull_request}" "${BUILDKITE_PULL_REQUEST_BASE_BRANCH:-}"
+  if [[ "${pull_request}" != "false" ]]; then
+    trigger "${pull_request}" "${BUILDKITE_PULL_REQUEST_BASE_BRANCH:-}"
+    exit $?
+  fi
+  if [[ "${BUILDKITE_BRANCH}" != "${BUILDKITE_PIPELINE_DEFAULT_BRANCH}" ]]; then
+    echo "Not on default branch, skipping"
+    exit 0
+  fi
+  update_prs=${BUILDKITE_PLUGIN_GITHUB_MERGED_PR_UPDATE_PRS:-false}
+  if [[ ${update_prs} == "true" ]]; then
+    echo "Updating PRs"
+    trigger_prs
+    exit $?
+  fi
+  echo "Not configured to update PRs"
 else
   echo "Invalid mode: ${mode}"
   exit 1
