@@ -21,7 +21,7 @@ EOL
 }
 
 trigger_prs() {
-  git fetch origin
+  git fetch origin --prune
   export -f trigger_pr_branch
   git ls-remote origin 'refs/pull/*/head' | sort -t'/' -k 3 -nr | xargs -P 20 -n 2 bash -c 'trigger_pr_branch $@' _
 }
@@ -38,12 +38,12 @@ trigger_pr_branch() {
   fi
 
   # Unless the commit already exists in the default branch (i.e. PR is merged)
-  if git merge-base --is-ancestor "${sha}" "${BUILDKITE_PIPELINE_DEFAULT_BRANCH}" 2>/dev/null; then
+  if git merge-base --is-ancestor "${sha}" "origin/${BUILDKITE_PIPELINE_DEFAULT_BRANCH}" 2>/dev/null; then
     return
   fi
 
   set +e
-  branch="$(git branch -a -q --contains "${sha}" 2>/dev/null | grep 'remotes/origin' | sed -e 's,^[[:space:]]*remotes/origin/,,g')"
+  branch="$(git branch -a -q --contains "${sha}" 2>/dev/null | grep 'remotes/origin' | grep -v -e 'remotes/origin/master' -e 'remotes/origin/HEAD' | sed -e 's,^[[:space:]]*remotes/origin/,,g')"
   set -e
 
   # Unless the PR branch was deleted
