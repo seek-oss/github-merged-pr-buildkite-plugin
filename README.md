@@ -28,7 +28,7 @@ When using `checkout` mode, the plugin should be specified on each build step (e
 
 ```yml
 plugins: &plugins
-  - seek-oss/github-merged-pr#v1.1.1:
+  - seek-oss/github-merged-pr#v1.1.2:
       mode: checkout
 
 steps:
@@ -55,7 +55,7 @@ steps:
     commands:
       - make something
     plugins:
-      - seek-oss/github-merged-pr#v1.1.1:
+      - seek-oss/github-merged-pr#v1.1.2:
           mode: trigger
           update_prs: true
           oldest_pr: 12
