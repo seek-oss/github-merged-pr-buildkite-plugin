@@ -110,28 +110,21 @@ post_checkout_hook="$PWD/hooks/post-checkout"
     "pipeline upload : echo UPLOADED_PIPELINE"
 
   stub git \
-    "fetch origin : echo FETCHED" \
-    "ls-remote origin 'refs/pull/*/head' : echo deadbeef refs/pull/123/head" \
-    "merge-base --is-ancestor deadbeef dev : echo UNMERGED && false" \
+    "fetch origin --prune : echo FETCHED" \
+    "ls-remote origin refs/pull/*/head : echo beefbeef refs/pull/122/head deadbeef refs/pull/123/head" \
+    "merge-base --is-ancestor deadbeef origin/dev : echo UNMERGED && false" \
     "branch -a -q --contains deadbeef : echo remotes/origin/MY_PR_BRANCH"
-
-  stub grep \
-    "remotes/origin : echo remotes/origin/MY_PR_BRANCH"
-
-  stub sed \
-    "-e 's,^[[:space:]]*remotes/origin/,,g' : echo MY_PR_BRANCH"
 
   run "$post_checkout_hook"
 
   assert_success
   assert_output --partial "Updating PRs"
   assert_output --partial "FETCHED"
+  assert_output --partial "UNMERGED"
   assert_output --partial "Triggering new build of my-pipeline for PR 123"
   assert_output --partial "UPLOADED_PIPELINE"
   unstub buildkite-agent
   unstub git
-  unstub grep
-  unstub sed
 }
 
 @test "Doesn't rebuild merged PR branches" {
@@ -142,9 +135,9 @@ post_checkout_hook="$PWD/hooks/post-checkout"
   export BUILDKITE_BRANCH="dev"
 
   stub git \
-    "fetch origin : echo FETCHED" \
+    "fetch origin --prune : echo FETCHED" \
     "ls-remote origin 'refs/pull/*/head' : echo deadbeef refs/pull/123/head" \
-    "merge-base --is-ancestor deadbeef dev : echo MERGED"
+    "merge-base --is-ancestor deadbeef origin/dev : echo MERGED"
 
   run "$post_checkout_hook"
 
@@ -163,7 +156,7 @@ post_checkout_hook="$PWD/hooks/post-checkout"
   export BUILDKITE_BRANCH="dev"
 
   stub git \
-    "fetch origin : echo FETCHED" \
+    "fetch origin --prune : echo FETCHED" \
     "ls-remote origin 'refs/pull/*/head' : echo deadbeef refs/pull/123/head"
 
   run "$post_checkout_hook"
