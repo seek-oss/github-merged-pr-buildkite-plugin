@@ -83,7 +83,7 @@ merge() {
   (
     # env vars to ensure merge is non-interactive
     export GIT_AUTHOR_NAME="github-merged-pr-buildkite-plugin"
-    export GIT_COMMITTER_EMAIL="github-merged-pr-buildkite-plugin@stellargraph"
+    export GIT_COMMITTER_EMAIL="github-merged-pr-buildkite-plugin@tee-md"
     export GIT_COMMITTER_NAME="github-merged-pr-buildkite-plugin"
     export GIT_MERGE_AUTOEDIT="no"
     if ! git merge "${BUILDKITE_COMMIT}"; then

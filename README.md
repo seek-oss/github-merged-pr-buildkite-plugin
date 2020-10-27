@@ -74,7 +74,7 @@ steps:
     plugins:
       <<: *plugins
       docker#v1.3.0:
-        image: "stellargraph/image"
+        image: "tee-md/image"
         environment:
           - BUILDKITE_BRANCH=${BUILDKITE_BRANCH?}
           - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST?}
