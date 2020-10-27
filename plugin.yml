@@ -1,6 +1,6 @@
 name: GitHub Merged Pull Request
 description: Checks out the GitHub PR merge ref rather than the branch HEAD
-author: https://github.com/seek-oss
+author: https://github.com/tee-md
 requirements: []
 configuration:
   properties:

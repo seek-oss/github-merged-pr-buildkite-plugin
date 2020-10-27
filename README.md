@@ -28,7 +28,7 @@ When using `checkout` mode, the plugin should be specified on each build step (e
 
 ```yml
 plugins: &plugins
-  - seek-oss/github-merged-pr#v1.1.2:
+  - tee-md/github-merged-pr#v1.1.2:
       mode: checkout
 
 steps:
@@ -55,7 +55,7 @@ steps:
     commands:
       - make something
     plugins:
-      - seek-oss/github-merged-pr#v1.1.2:
+      - tee-md/github-merged-pr#v1.1.2:
           mode: trigger
           update_prs: true
           oldest_pr: 12
@@ -63,6 +63,23 @@ steps:
   - label: 'Make something else'
     commands:
       - make something-else
+```
+
+An example of how to use it with the docker plugin
+
+```yml
+steps:
+  - label: "test"
+    command: ".buildkite/script.sh"
+    plugins:
+      <<: *plugins
+      docker#v1.3.0:
+        image: "stellargraph/image"
+        environment:
+          - BUILDKITE_BRANCH=${BUILDKITE_BRANCH?}
+          - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST?}
+    agents:
+    - "aws:instance-type=t2.medium"
 ```
 
 # Tests

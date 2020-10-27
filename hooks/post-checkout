@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# buildkite treats lines starting with +++ (or ---) specially, and the
+# tracing here can result in that, so let's switch to * to avoid that
+export PS4=$(echo "$PS4" | sed 's/+/*/g')
+set -xeuo pipefail
+
 set -euo pipefail
 
 trigger() {
@@ -7,7 +12,7 @@ trigger() {
   local branch="$2"
   local slug="${BUILDKITE_PIPELINE_SLUG}"
   echo "Triggering merged build of ${slug} for PR ${pr}"
-  cat <<EOL | buildkite-agent pipeline upload
+  cat << EOL | buildkite-agent pipeline upload
   steps:
     - label: "Merge build"
       trigger: "${slug}"
@@ -38,12 +43,12 @@ trigger_pr_branch() {
   fi
 
   # Unless the commit already exists in the default branch (i.e. PR is merged)
-  if git merge-base --is-ancestor "${sha}" "origin/${BUILDKITE_PIPELINE_DEFAULT_BRANCH}" 2>/dev/null; then
+  if git merge-base --is-ancestor "${sha}" "origin/${BUILDKITE_PIPELINE_DEFAULT_BRANCH}" 2> /dev/null; then
     return
   fi
 
   set +e
-  branch="$(git branch -a -q --contains "${sha}" 2>/dev/null | grep 'remotes/origin' | grep -v -e 'remotes/origin/master' -e 'remotes/origin/HEAD' | sed -e 's,^[[:space:]]*remotes/origin/,,g')"
+  branch="$(git branch -a -q --contains "${sha}" 2> /dev/null | grep 'remotes/origin' | grep -v -e 'remotes/origin/master' -e 'remotes/origin/HEAD' | sed -e 's,^[[:space:]]*remotes/origin/,,g')"
   set -e
 
   # Unless the PR branch was deleted
@@ -67,23 +72,30 @@ trigger_pr_branch() {
 
 merge() {
   local target_branch="$1"
-  if [[ -z "${target_branch}" ]] ; then
+  if [[ -z "${target_branch}" ]]; then
     echo "No pull request target branch"
     exit 1
   fi
 
   git fetch -v origin "${target_branch}"
   git checkout FETCH_HEAD
-  # env vars to ensure merge is non-interactive
-  GIT_AUTHOR_NAME="github-merged-pr-buildkite-plugin" \
-  GIT_COMMITTER_EMAIL="auto-merge@buildkite" \
-  GIT_COMMITTER_NAME="github-merged-pr-buildkite-plugin" \
-  git merge --no-edit "${BUILDKITE_COMMIT}" || {
-    local merge_result=$?
-    echo "Merge failed: ${merge_result}"
-    git merge --abort
-    exit $merge_result
-  }
+  # run in a subshell to restrict the scope of the exported env vars
+  (
+    # env vars to ensure merge is non-interactive
+    export GIT_AUTHOR_NAME="github-merged-pr-buildkite-plugin"
+    export GIT_COMMITTER_EMAIL="github-merged-pr-buildkite-plugin@stellargraph"
+    export GIT_COMMITTER_NAME="github-merged-pr-buildkite-plugin"
+    export GIT_MERGE_AUTOEDIT="no"
+    if ! git merge "${BUILDKITE_COMMIT}"; then
+      # if the merge failed (due to conflicts), this script should
+      # still succeed, and testing should still continue (on the
+      # original code): it's useful to know whether that code compiles
+      # in isolation, and there will still be another set of testing
+      # done on the real merge, once the conflicts are resolved.
+      git merge --abort
+      git checkout "${BUILDKITE_COMMIT}"
+    fi
+  )
 }
 
 force_merge="${GITHUB_MERGED_PR_FORCE_BRANCH:-}"
